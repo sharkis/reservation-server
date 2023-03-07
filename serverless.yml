@@ -17,20 +17,20 @@ functions:
     handler: reservations.createReservation
     events:
       - httpApi:
-        path: /reservation
-        method: POST
+          path: /reservation
+          method: POST
   getReservations:
     handler: reservations.getReservations
     events:
       - httpApi:
-        path: /reservation
-        method: GET
+          path: /reservation
+          method: GET
   checkReservation:
     handler: reservations.checkReservation
     events:
       - httpApi:
-        path: /checkReservation
-        method: POST
+          path: /checkReservation
+          method: POST
 
 resources:
   Resources:
@@ -47,7 +47,7 @@ resources:
           - AttributeName: day
             KeyType: HASH
           - AttributeName: uuid
-            KeyType: HASH
+            KeyType: RANGE
         TableName: ${self:service}-reservationTable-${sls:stage}
     CustomerTable:
       Type: AWS::DynamoDB::Table
@@ -79,5 +79,4 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
   environment:
     DYNAMODB_CUSTOMER_TABLE: ${self:service}-customerTable-${sls:stage}
-    DYNAMODB_CUSTOMER_TABLE: ${self:service}-reservationTable-${sls:stage}
-    LAMBDA_EXECUTOR: local
+    DYNAMODB_RESERVATION_TABLE: ${self:service}-reservationTable-${sls:stage}

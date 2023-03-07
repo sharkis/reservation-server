@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const createReservation = async (event) => {
   const body = JSON.parse(Buffer.from(event.body, "base64").toString());
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const date = +(body.timestamp / 86400).toFixed(0);
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
@@ -36,12 +37,13 @@ const getReservations = async (event) => {
       total: result.Count,
       items: await result.Items.map((reservation) => {
         return {
-          area: body.area,
-          customer: body.customer,
-          notes: body.notes,
-          occasion: body.occasion,
-          size: body.size,
-          timestamp: body.timestamp,
+          area: reservation.area,
+          customer: reservation.customer,
+          notes: reservation.notes,
+          occasion: reservation.occasion,
+          size: reservation.size,
+          timestamp: reservation.timestamp,
+          date: reservation.day
         };
       }),
     }),
