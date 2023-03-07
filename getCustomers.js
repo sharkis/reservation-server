@@ -26,5 +26,9 @@ module.exports.getCustomers = async (event) => {
         };
       }),
     }),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
   };
 };

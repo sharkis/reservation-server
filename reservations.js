@@ -6,6 +6,16 @@ const createReservation = async (event) => {
   const body = JSON.parse(Buffer.from(event.body, "base64").toString());
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const date = +(body.timestamp / 86400).toFixed(0);
+  const custParams = {
+    TableName: process.env.DYNAMODB_CUSTOMER_TABLE,
+    Item: {
+      primary_key: uuidv4(),
+      name: body.name,
+      email: body.email,
+      phone: body.phone,
+    },
+
+  }
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
@@ -22,6 +32,13 @@ const createReservation = async (event) => {
   await dynamoDb.put(putParams).promise();
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
+    body: JSON.stringify({
+      status:"OK"
+    })
   };
 };
 
@@ -47,12 +64,16 @@ const getReservations = async (event) => {
         };
       }),
     }),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
   };
 };
 
 const checkReservation = async (event) => {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const body = JSON.parse(Buffer.from(event.body, "base64").toString());
+  const body = JSON.parse(event.body);
   const sdate = +(body.timestamp / 86400).toFixed(0);
   const windowStart = body.timestamp - 150 * 60; // 150 minutes - longest reservation
   const windowEnd = body.timestamp + 150 * 60; // 150 minutes - longest reservation
@@ -76,6 +97,10 @@ const checkReservation = async (event) => {
       total: result.Count || 0,
       available: true,
     }),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
   };
 };
 

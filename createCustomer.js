@@ -18,5 +18,9 @@ module.exports.createCustomer = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({ primary_key: putParams.primary_key }),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
   };
 };
