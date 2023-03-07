@@ -4,18 +4,51 @@ functions:
   createCustomer:
     handler: createCustomer.createCustomer
     events:
-      - http:
+      - httpApi:
           path: /
           method: POST
   getCustomers:
     handler: getCustomers.getCustomers
     events:
-      - http:
+      - httpApi:
           path: /
           method: GET
+  createReservation:
+    handler: reservations.createReservation
+    events:
+      - httpApi:
+        path: /reservation
+        method: POST
+  getReservations:
+    handler: reservations.getReservations
+    events:
+      - httpApi:
+        path: /reservation
+        method: GET
+  checkReservation:
+    handler: reservations.checkReservation
+    events:
+      - httpApi:
+        path: /checkReservation
+        method: POST
 
 resources:
   Resources:
+    ReservationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: day
+            AttributeType: N
+          - AttributeName: uuid
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: day
+            KeyType: HASH
+          - AttributeName: uuid
+            KeyType: HASH
+        TableName: ${self:service}-reservationTable-${sls:stage}
     CustomerTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -41,7 +74,10 @@ provider:
             - "dynamodb:Scan*"
             - "dynamodb:UpdateItem"
             - "dynamodb:DeleteItem"
-          Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-customerTable-${sls:stage}
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-customerTable-${sls:stage}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
   environment:
     DYNAMODB_CUSTOMER_TABLE: ${self:service}-customerTable-${sls:stage}
+    DYNAMODB_CUSTOMER_TABLE: ${self:service}-reservationTable-${sls:stage}
     LAMBDA_EXECUTOR: local
