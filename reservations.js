@@ -52,14 +52,34 @@ const getReservations = async (event) => {
 
 const checkReservation = async (event) => {
   const body = JSON.parse(Buffer.from(event.body, "base64").toString());
+  const sdate = +(body.timestamp / 86400).toFixed(0);
+  const edate = sdate+1;
+  const windowStart = body.timestamp - (150 * 60) // 150 minutes - longest reservation
+  const windowEnd = body.timestamp + (150 * 60) // 150 minutes - longest reservation
   const scanParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Select: COUNT,
+    ExpressionAttributeValues:{
+      ":sd":{
+        N: sdate
+      },
+      ":ed":{
+        N: edate
+      }
+    },
+    KeyConditionExpression: "day BETWEEN :d"
+
   };
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const result = await dynamoDb.scan(scanParams).promise();
   return {
     statusCode: 200,
+    body: JSON.stringify(
+      {
+        total:0,
+        available:true,
+      }
+    )
   };
 };
 
