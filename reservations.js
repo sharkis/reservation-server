@@ -3,7 +3,7 @@ const AWS = require("aws-sdk");
 const { v4: uuidv4 } = require("uuid");
 
 const createReservation = async (event) => {
-  const body = JSON.parse(Buffer.from(event.body, "base64").toString());
+  const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const date = +(body.timestamp / 86400).toFixed(0);
   const custParams = {
@@ -14,15 +14,15 @@ const createReservation = async (event) => {
       email: body.email,
       phone: body.phone,
     },
-
   }
+  custResult = await dynamoDb.put(custParams).promise();
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
       dayval: date,
       uuid: uuidv4(),
       area: body.area,
-      customer: body.customer,
+      customer: custParams.primary_key,
       notes: body.notes,
       occasion: body.occasion,
       size: body.size,
