@@ -38,13 +38,13 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: day
+          - AttributeName: dayval
             AttributeType: N
           - AttributeName: uuid
             AttributeType: S
         BillingMode: PAY_PER_REQUEST
         KeySchema:
-          - AttributeName: day
+          - AttributeName: dayval
             KeyType: HASH
           - AttributeName: uuid
             KeyType: RANGE
@@ -72,6 +72,7 @@ provider:
             - "dynamodb:PutItem"
             - "dynamodb:Get*"
             - "dynamodb:Scan*"
+            - "dynamodb:Query"
             - "dynamodb:UpdateItem"
             - "dynamodb:DeleteItem"
           Resource:

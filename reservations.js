@@ -9,7 +9,7 @@ const createReservation = async (event) => {
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
-      day: date,
+      dayval: date,
       uuid: uuidv4(),
       area: body.area,
       customer: body.customer,
@@ -43,7 +43,7 @@ const getReservations = async (event) => {
           occasion: reservation.occasion,
           size: reservation.size,
           timestamp: reservation.timestamp,
-          date: reservation.day
+          date: reservation.dayval,
         };
       }),
     }),
@@ -51,35 +51,31 @@ const getReservations = async (event) => {
 };
 
 const checkReservation = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const body = JSON.parse(Buffer.from(event.body, "base64").toString());
   const sdate = +(body.timestamp / 86400).toFixed(0);
-  const edate = sdate+1;
-  const windowStart = body.timestamp - (150 * 60) // 150 minutes - longest reservation
-  const windowEnd = body.timestamp + (150 * 60) // 150 minutes - longest reservation
-  const scanParams = {
+  const windowStart = body.timestamp - 150 * 60; // 150 minutes - longest reservation
+  const windowEnd = body.timestamp + 150 * 60; // 150 minutes - longest reservation
+  const queryParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
-    Select: COUNT,
-    ExpressionAttributeValues:{
-      ":sd":{
-        N: sdate
-      },
-      ":ed":{
-        N: edate
-      }
+    ExpressionAttributeValues: {
+      ":sd": sdate,
+      ":st": windowStart,
+      ":et": windowEnd
     },
-    KeyConditionExpression: "day BETWEEN :d"
-
+    ExpressionAttributeNames: {
+      "#ts": "timestamp"
+    },
+    KeyConditionExpression: "dayval = :sd",
+    FilterExpression: "#ts > :st and #ts < :et",
   };
-  const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const result = await dynamoDb.scan(scanParams).promise();
+  const result = await dynamoDb.query(queryParams).promise();
   return {
     statusCode: 200,
-    body: JSON.stringify(
-      {
-        total:0,
-        available:true,
-      }
-    )
+    body: JSON.stringify({
+      total: result.Count || 0,
+      available: true,
+    }),
   };
 };
 
