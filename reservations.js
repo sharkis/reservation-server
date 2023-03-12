@@ -27,19 +27,22 @@ const createReservation = async (event) => {
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
     },
     body: JSON.stringify({
-      status:"OK"
-    })
+      status: "OK",
+    }),
   };
 };
 
 const getReservations = async (event) => {
+  const qdate = event.queryStringParameters.datetime;
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const scanParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
+    FilterExpression: "dayval = :d",
+    ExpressionAttributeValues: { ":d": +(qdate / 86400).toFixed(0) },
   };
   const result = await dynamoDb.scan(scanParams).promise();
   return {
@@ -59,8 +62,8 @@ const getReservations = async (event) => {
       }),
     }),
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
     },
   };
 };
@@ -76,10 +79,10 @@ const checkReservation = async (event) => {
     ExpressionAttributeValues: {
       ":sd": sdate,
       ":st": windowStart,
-      ":et": windowEnd
+      ":et": windowEnd,
     },
     ExpressionAttributeNames: {
-      "#ts": "timestamp"
+      "#ts": "timestamp",
     },
     KeyConditionExpression: "dayval = :sd",
     FilterExpression: "#ts > :st and #ts < :et",
@@ -92,8 +95,8 @@ const checkReservation = async (event) => {
       available: true,
     }),
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
     },
   };
 };
