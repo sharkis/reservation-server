@@ -6,23 +6,17 @@ const createReservation = async (event) => {
   const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const date = +(body.datetime / 86400).toFixed(0);
-  const custParams = {
-    TableName: process.env.DYNAMODB_CUSTOMER_TABLE,
-    Item: {
-      primary_key: uuidv4(),
-      name: body.customer.name,
-      email: body.customer.email,
-      phone: body.customer.phone,
-    },
-  }
-  await dynamoDb.put(custParams).promise();
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
       dayval: date,
       uuid: uuidv4(),
       area: body.area,
-      customer: custParams.primary_key,
+      customer: {
+        name: body.customer.name,
+        email: body.customer.email,
+        phone: body.customer.phone,
+      },
       notes: body.notes,
       occasion: body.occasion,
       size: body.size,

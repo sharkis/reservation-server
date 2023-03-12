@@ -1,18 +1,6 @@
 service: reservation-server
 
 functions:
-  createCustomer:
-    handler: createCustomer.createCustomer
-    events:
-      - httpApi:
-          path: /
-          method: POST
-  getCustomers:
-    handler: getCustomers.getCustomers
-    events:
-      - httpApi:
-          path: /
-          method: GET
   createReservation:
     handler: reservations.createReservation
     events:
@@ -49,17 +37,6 @@ resources:
           - AttributeName: uuid
             KeyType: RANGE
         TableName: ${self:service}-reservationTable-${sls:stage}
-    CustomerTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        AttributeDefinitions:
-          - AttributeName: primary_key
-            AttributeType: S
-        BillingMode: PAY_PER_REQUEST
-        KeySchema:
-          - AttributeName: primary_key
-            KeyType: HASH
-        TableName: ${self:service}-customerTable-${sls:stage}
 
 provider:
   name: aws
@@ -78,8 +55,6 @@ provider:
             - "dynamodb:UpdateItem"
             - "dynamodb:DeleteItem"
           Resource:
-            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-customerTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
   environment:
-    DYNAMODB_CUSTOMER_TABLE: ${self:service}-customerTable-${sls:stage}
     DYNAMODB_RESERVATION_TABLE: ${self:service}-reservationTable-${sls:stage}
