@@ -13,6 +13,12 @@ functions:
       - httpApi:
           path: /reservation
           method: GET
+  deleteReservations:
+    handler: reservations.deleteReservation
+    events:
+      - httpApi:
+          path: /reservation
+          method: DELETE
   checkReservation:
     handler: reservations.checkReservation
     events:

@@ -101,8 +101,28 @@ const checkReservation = async (event) => {
   };
 };
 
+const deleteReservation = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const deleteParams = {
+    TableName: process.env.DYNAMODB_RESERVATION_TABLE,
+    Key: {
+      HashKey: body.key,
+    },
+  };
+  await dynamoDb.delete(deleteParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+  };
+};
+
 module.exports = {
   checkReservation,
   createReservation,
   getReservations,
+  deleteReservation,
 };
