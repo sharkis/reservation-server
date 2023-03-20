@@ -64,5 +64,5 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
   environment:
     DYNAMODB_RESERVATION_TABLE: ${self:service}-reservationTable-${sls:stage}
-    twilioSID: ${ssm:/twiliosid~true}
-    twilioAuth: ${ssm:/twilioauth~true}
+    twilioSID: ${ssm:/twiliosid}
+    twilioAuth: ${ssm:/twilioauth}
