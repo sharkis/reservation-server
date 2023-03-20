@@ -1,7 +1,7 @@
 "use strict";
 const AWS = require("aws-sdk");
 const { v4: uuidv4 } = require("uuid");
-const { phone } = require("phone");
+const {phone} = require('phone');
 const client = require("twilio")(process.env.twilioSID, process.env.twilioAuth);
 const dayjs = require("dayjs");
 const timezone = require("dayjs/plugin/timezone");
@@ -29,17 +29,18 @@ const createReservation = async (event) => {
       timestamp: body.datetime,
     },
   };
-  const toNumber = phone(body.customer.phone);
+  const toNumber = phone(body.customer.phone)
   await dynamoDb.put(putParams).promise();
-  if (toNumber.isValid) {
-    await client.messages.create({
-      body: `Your Lola Rose reservation for ${body.size} people on ${dayjs
-        .unix(body.datetime)
-        .tz("America/Denver")
-        .format("dddd, D MMM [at] h:mm a")} is CONFIRMED.`,
-      from: origPhone,
-      to: toNumber,
-    });
+  if(toNumber.isValid){
+  await client.messages.create({
+    body: `Your Lola Rose reservation for ${body.size} people on ${dayjs
+      .unix(body.datetime)
+      .tz("America/Denver")
+      .format("dddd, D MMM [at] h:mm a")} is CONFIRMED.`,
+    from: origPhone,
+    to: toNumber.phoneNumber,
+  });
+
   }
   return {
     statusCode: 200,
