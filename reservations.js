@@ -1,10 +1,11 @@
 "use strict";
 const AWS = require("aws-sdk");
 const { v4: uuidv4 } = require("uuid");
-const client = require('twilio')(process.env.twilioSID, process.env.twilioAuth);
-const dayjs = require('dayjs');
-const timezone = require('dayjs/plugin/timezone')
-dayjs.extend(timezone)
+const { phone } = require("phone");
+const client = require("twilio")(process.env.twilioSID, process.env.twilioAuth);
+const dayjs = require("dayjs");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(timezone);
 
 const createReservation = async (event) => {
   const origPhone = "+18884921198";
@@ -28,12 +29,18 @@ const createReservation = async (event) => {
       timestamp: body.datetime,
     },
   };
+  const toNumber = phone(body.customer.phone);
   await dynamoDb.put(putParams).promise();
-  await client.messages.create({
-    body: `Your Lola Rose reservation for ${body.size} people on ${dayjs.unix(body.datetime).tz("America/Denver").format('dddd, D MMM [at] h:mm a')} is CONFIRMED.`,
-    from: origPhone,
-    to: body.customer.phone
-  })
+  if (toNumber.isValid) {
+    await client.messages.create({
+      body: `Your Lola Rose reservation for ${body.size} people on ${dayjs
+        .unix(body.datetime)
+        .tz("America/Denver")
+        .format("dddd, D MMM [at] h:mm a")} is CONFIRMED.`,
+      from: origPhone,
+      to: toNumber,
+    });
+  }
   return {
     statusCode: 200,
     headers: {

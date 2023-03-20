@@ -28,6 +28,17 @@ functions:
 
 resources:
   Resources:
+    VipTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-vipTable-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
     ReservationTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -64,5 +75,6 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
   environment:
     DYNAMODB_RESERVATION_TABLE: ${self:service}-reservationTable-${sls:stage}
+    DYNAMODB_VIP_TABLE: ${self:service}-vipTable-${sls:stage}
     twilioSID: ${ssm:/twiliosid}
     twilioAuth: ${ssm:/twilioauth}
