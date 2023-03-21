@@ -25,6 +25,18 @@ functions:
       - httpApi:
           path: /checkReservation
           method: POST
+  getVip:
+    handler: vips.getVip
+    events:
+      - httpApi:
+          path: /vip
+          method: GET
+  getVips:
+    handler: vips.getVips
+    events:
+      - httpApi:
+          path: /vips
+          method: GET
 
 resources:
   Resources:
