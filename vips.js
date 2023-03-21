@@ -9,11 +9,20 @@ const getVips = async (event) => {
     TableName: process.env.DYNAMODB_VIP_TABLE,
   };
   const result = await dynamoDb.scan(scanParams).promise();
+  if (!result.Count) {
+    return {
+      statusCode: 404,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+    };
+  }
   return {
     statusCode: 200,
     body: JSON.stringify({
       total: result.Count,
-      items: result.items.map((vip) => {
+      items: result.Items.map((vip) => {
         return {
           name: vip.name,
           phone: vip.phone,
@@ -39,11 +48,11 @@ const getVip = async (event) => {
   };
   const result = await dynamoDb.query(queryParams).promise();
   return {
-    statusCode:200,
+    statusCode: 200,
     body: JSON.stringify({
-        name: result.name
-    })
-  }
+      name: result.name,
+    }),
+  };
 };
 
 const createVip = async (event) => {
