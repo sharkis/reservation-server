@@ -10,16 +10,21 @@ const corsHeaders = {
 const createTable = async (event) => {
   const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const putParams = {
-    TableName: process.env.DYNAMODB_LAYOUT_TABLE,
-    Item: {
-      x: 0,
-      y: 0,
-      rotation: 0,
-      capacity: 0,
+  const putRequests = body.map((t) => ({
+    PutRequest: {
+      Item: {
+        uuid: t.id,
+        x: t.x,
+        y: t.y,
+      },
+    },
+  }));
+  const batchParams = {
+    RequestItems: {
+      [process.env.DYNAMODB_LAYOUT_TABLE]: putRequests,
     },
   };
-  await dynamoDb.put(putParams).promise();
+  await dynamoDb.batchWrite(batchParams).promise();
   return {
     ...corsHeaders,
     statusCode: 200,
@@ -38,7 +43,11 @@ const getTables = async () => {
     statusCode: 200,
     body: JSON.stringify({
       total: result.Count,
-      items: result.Items,
+      items: result.Items.map(t=>({
+        x:t.x,
+        y:t.y,
+        id:t.uuid
+      })),
     }),
   };
 };

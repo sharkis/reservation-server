@@ -25,6 +25,30 @@ functions:
       - httpApi:
           path: /checkReservation
           method: POST
+  createTable:
+    handler: tables.createTable
+    events:
+      - httpApi:
+          path: /tables
+          method: POST
+  getTables:
+    handler: tables.getTables
+    events:
+      - httpApi:
+          path: /tables
+          method: GET
+  deleteTable:
+    handler: tables.deleteTable
+    events:
+      - httpApi:
+          path: /tables
+          method: DELETE
+  updateTable:
+    handler: tables.updateTable
+    events:
+      - httpApi:
+          path: /tables
+          method: PUT
 
 resources:
   Resources:
@@ -82,6 +106,7 @@ provider:
             - "dynamodb:Query"
             - "dynamodb:UpdateItem"
             - "dynamodb:DeleteItem"
+            - "dynamodb:BatchWriteItem"
           Resource:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-vipTable-${sls:stage}
