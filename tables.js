@@ -16,6 +16,8 @@ const createTable = async (event) => {
         uuid: t.id,
         x: t.x,
         y: t.y,
+        name: t.name,
+        capacity: t.capacity,
       },
     },
   }));
@@ -43,10 +45,12 @@ const getTables = async () => {
     statusCode: 200,
     body: JSON.stringify({
       total: result.Count,
-      items: result.Items.map(t=>({
-        x:t.x,
-        y:t.y,
-        id:t.uuid
+      items: result.Items.map((t) => ({
+        x: t.x,
+        y: t.y,
+        id: t.uuid,
+        name: t.name,
+        capacity: t.capacity,
       })),
     }),
   };

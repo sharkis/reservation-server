@@ -29,6 +29,27 @@ const createReservation = async (event) => {
       timestamp: body.datetime,
     },
   };
+  const emailParams = {
+    Destination: {
+      ToAddresses: [body.customer.email],
+    },
+    Message: {
+      Body: {
+        Text: {
+          Charset: "UTF-8",
+          Data: `Your Lola Rose reservation for ${body.size} people on ${dayjs
+            .unix(body.datetime)
+            .tz("America/Denver")
+            .format("dddd, D MMM [at] h:mm a")} is CONFIRMED.`,
+        },
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: `Your Lola Rose reservation`,
+      },
+    },
+    Source: "contact@lolaroseelpaso.com",
+  };
   const toNumber = phone(body.customer.phone);
   await dynamoDb.put(putParams).promise();
   if (toNumber.isValid) {
@@ -41,6 +62,7 @@ const createReservation = async (event) => {
       to: toNumber.phoneNumber,
     });
   }
+  await new AWS.SES().sendEmail(emailParams).promise();
   return {
     statusCode: 200,
     headers: {
