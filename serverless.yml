@@ -141,6 +141,11 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-vipTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-layoutTable-${sls:stage}
+        - Effect: "Allow"
+          Action:
+            - "ses:sendEmail"
+          Resource:
+            - "*"
   environment:
     DYNAMODB_RESERVATION_TABLE: ${self:service}-reservationTable-${sls:stage}
     DYNAMODB_VIP_TABLE: ${self:service}-vipTable-${sls:stage}
