@@ -49,6 +49,36 @@ functions:
       - httpApi:
           path: /tables
           method: PUT
+  getVip:
+    handler: vips.getVip
+    events:
+      - httpApi:
+          path: /vip
+          method: GET
+  getVips:
+    handler: vips.getVips
+    events:
+      - httpApi:
+          path: /vips
+          method: GET
+  updateVip:
+    handler: vips.updateVip
+    events:
+      - httpApi:
+          path: /vip
+          method: PUT
+  deleteVip:
+    handler: vips.deleteVip
+    events:
+      - httpApi:
+          path: /vip
+          method: DELETE
+  createVip:
+    handler: vips.createVip
+    events:
+      - httpApi:
+          path: /vip
+          method: POST
 
 resources:
   Resources:
