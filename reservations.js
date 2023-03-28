@@ -14,6 +14,7 @@ const createReservation = async (event) => {
   const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const date = +(body.datetime / 86400).toFixed(0);
+  const ses = new AWS.SES();
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
@@ -64,7 +65,50 @@ const createReservation = async (event) => {
       to: toNumber.phoneNumber,
     });
   }
-  await new AWS.SES().sendEmail(emailParams).promise();
+  await ses.sendEmail(emailParams).promise();
+
+  // check if this reservation is for VIP
+  const queryParams = {
+    TableName: process.env.DYNAMODB_VIP_TABLE,
+    ExpressionAttributeValues: {
+      ":e": body.customer.email,
+    },
+    FilterExpression: "email = :e",
+  };
+  const result = await dynamoDb.scan(queryParams).promise();
+  if (result.Count > 0) {
+    // email admins if it is
+    const adminScanParams = {
+      TableName: process.env.DYNAMODB_ADMIN_TABLE,
+    };
+    const admins = await dynamoDb.scan(adminScanParams).promise();
+    const adminEmails = admins.Items.map((a) => a.email);
+    const adminEmailParams = {
+      Destination: {
+        ToAddresses: adminEmails,
+      },
+      Message: {
+        Body: {
+          Text: {
+            Charset: "UTF-8",
+            Data: `VIP Lola Rose reservation for ${body.customer.name}, ${
+              body.size
+            } people on ${dayjs
+              .unix(body.datetime)
+              .tz("America/Denver")
+              .format("dddd, D MMM [at] h:mm a")} has been created.`,
+          },
+        },
+        Subject: {
+          Charset: "UTF-8",
+          Data: `VIP Lola Rose reservation`,
+        },
+      },
+      Source: "contact@lolaroseelpaso.com",
+    };
+    await ses.sendEmail(adminEmailParams).promise();
+  }
+
   return {
     statusCode: 200,
     headers: {

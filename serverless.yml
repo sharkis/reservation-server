@@ -79,6 +79,30 @@ functions:
       - httpApi:
           path: /vip
           method: POST
+  createAdmin:
+    handler: admin.createAdmin
+    events:
+      - httpApi:
+          path: /admin
+          method: POST
+  deleteAdmin:
+    handler: admin.deleteAdmin
+    events:
+      - httpApi:
+          path: /admin
+          method: DELETE
+  updateAdmin:
+    handler: admin.updateAdmin
+    events:
+      - httpApi:
+          path: /admin
+          method: PUT
+  getAdmins:
+    handler: admin.getAdmins
+    events:
+      - httpApi:
+          path: /admins
+          method: GET
 
 resources:
   Resources:
@@ -119,6 +143,17 @@ resources:
         KeySchema:
           - AttributeName: uuid
             KeyType: HASH
+    AdminTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-adminTable-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
 
 provider:
   name: aws
@@ -141,6 +176,7 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-reservationTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-vipTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-layoutTable-${sls:stage}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-adminTable-${sls:stage}
         - Effect: "Allow"
           Action:
             - "ses:sendEmail"
@@ -150,5 +186,6 @@ provider:
     DYNAMODB_RESERVATION_TABLE: ${self:service}-reservationTable-${sls:stage}
     DYNAMODB_VIP_TABLE: ${self:service}-vipTable-${sls:stage}
     DYNAMODB_LAYOUT_TABLE: ${self:service}-layoutTable-${sls:stage}
+    DYNAMODB_ADMIN_TABLE: ${self:service}-adminTable-${sls:stage}
     twilioSID: ${ssm:/twiliosid}
     twilioAuth: ${ssm:/twilioauth}
