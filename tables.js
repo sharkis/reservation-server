@@ -51,6 +51,7 @@ const getTables = async () => {
         id: t.uuid,
         name: t.name,
         capacity: t.capacity,
+        rotation: t.rotation,
       })),
     }),
   };
