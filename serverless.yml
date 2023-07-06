@@ -102,6 +102,53 @@ functions:
     events:
       - httpApi:
           path: /admins
+  createEvent:
+    handler: events.createEvent
+    events:
+      - httpApi:
+          path: /event
+          method: POST
+  deleteEvent:
+    handler: events.deleteEvent
+    events:
+      - httpApi:
+          path: /event
+          method: DELETE
+  updateEvent:
+    handler: events.updateEvent
+    events:
+      - httpApi:
+          path: /event
+          method: PUT
+  getEvents:
+    handler: events.getEvents
+    events:
+      - httpApi:
+          path: /events
+          method: GET
+  createTag:
+    handler: tags.createTag
+    events:
+      - httpApi:
+          path: /tag
+          method: POST
+  deleteTag:
+    handler: tags.deleteTag
+    events:
+      - httpApi:
+          path: /tag
+          method: DELETE
+  updateTag:
+    handler: tags.updateTag
+    events:
+      - httpApi:
+          path: /tag
+          method: PUT
+  getTags:
+    handler: tags.getTags
+    events:
+      - httpApi:
+          path: /tags
           method: GET
 
 resources:
@@ -154,6 +201,28 @@ resources:
         KeySchema:
           - AttributeName: uuid
             KeyType: HASH
+    EventsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-eventsTable-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
+    TagsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-tagsTable-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
 
 provider:
   name: aws
@@ -177,6 +246,8 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-vipTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-layoutTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-adminTable-${sls:stage}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-eventsTable-${sls:stage}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-tagsTable-${sls:stage}
         - Effect: "Allow"
           Action:
             - "ses:sendEmail"

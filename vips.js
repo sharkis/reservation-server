@@ -27,6 +27,11 @@ const getVips = async (event) => {
           name: vip.name,
           phone: vip.phone,
           email: vip.email,
+          notes: vip.notes,
+          relationship: vip.relationship,
+          seating: vip.seating,
+          food: vip.food,
+          drink: vip.drink
         };
       }),
     }),
