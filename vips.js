@@ -116,7 +116,7 @@ const updateVip = async (event) => {
   const updateParams = {
     TableName: process.env.DYNAMODB_VIP_TABLE,
     Key: {
-      HashKey: body.uuid,
+      uuid: body.uuid
     },
     UpdateExpression:
       "set #n=:n, #p=:p, #e=:e, #no=:no, #f=:f, #d=:d, #s=:s, #r=:r",
@@ -162,6 +162,9 @@ const updateVip = async (event) => {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
     },
+    body: JSON.stringify({
+      status: "OK",
+    }),
   };
 };
 
