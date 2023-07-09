@@ -24,6 +24,7 @@ const getVips = async (event) => {
       total: result.Count,
       items: result.Items.map((vip) => {
         return {
+          uuid: vip.uuid,
           name: vip.name,
           phone: vip.phone,
           email: vip.email,
@@ -115,7 +116,7 @@ const updateVip = async (event) => {
   const updateParams = {
     TableName: process.env.DYNAMODB_VIP_TABLE,
     Key: {
-      HashKey: body.key,
+      HashKey: body.uuid,
     },
     UpdateExpression:
       "set #n=:n, #p=:p, #e=:e, #no=:no, #f=:f, #d=:d, #s=:s, #r=:r",
