@@ -102,6 +102,7 @@ functions:
     events:
       - httpApi:
           path: /admins
+          method: GET
   createEvent:
     handler: events.createEvent
     events:
