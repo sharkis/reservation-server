@@ -31,7 +31,7 @@ const getVips = async (event) => {
           relationship: vip.relationship,
           seating: vip.seating,
           food: vip.food,
-          drink: vip.drink
+          drink: vip.drink,
         };
       }),
     }),
@@ -70,6 +70,11 @@ const createVip = async (event) => {
       name: body.name,
       phone: body.phone,
       email: body.email,
+      notes: body.notes,
+      food: body.food,
+      drink: body.drink,
+      relationship: body.relationship,
+      seating: body.seating,
     },
   };
   await dynamoDb.put(putParams).promise();
@@ -104,7 +109,60 @@ const deleteVip = async (event) => {
   };
 };
 
-const updateVip = async (event) => {};
+const updateVip = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const updateParams = {
+    TableName: process.env.DYNAMODB_VIP_TABLE,
+    Key: {
+      HashKey: body.key,
+    },
+    UpdateExpression:
+      "set #n=:n, #p=:p, #e=:e, #no=:no, #f=:f, #d=:d, #s=:s, #r=:r",
+    ExpressionAttributeNames: {
+      "#n": "name",
+      "#p": "phone",
+      "#e": "email",
+      "#no": "notes",
+      "#f": "food",
+      "#d": "drink",
+      "#s": "seating",
+      "#r": "relationship",
+    },
+    ExpressionAttributeValues: {
+      ":n": body.name,
+      ":p": body.phone,
+      ":e": body.email,
+      ":no": body.notes,
+      ":f": body.food,
+      ":d": body.drink,
+      ":s": body.seating,
+      ":r": body.relationship,
+    },
+  };
+  const putParams = {
+    TableName: process.env.DYNAMODB_VIP_TABLE,
+    Item: {
+      uuid: uuidv4(),
+      name: body.name,
+      phone: body.phone,
+      email: body.email,
+      notes: body.notes,
+      food: body.food,
+      drink: body.drink,
+      relationship: body.relationship,
+      seating: body.seating,
+    },
+  };
+  await dynamoDb.update(updateParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+  };
+};
 
 module.exports = {
   createVip,
