@@ -8,9 +8,18 @@ const getAreas  = async (event) =>{
   const scanParams = {
     TableName: process.env.DYNAMODB_AREAS_TABLE,
   };
+  const result = await dynamoDb.scan(scanParams).promise();
   return {
     statusCode:200,
-    body:JSON.stringify({}),
+    body: JSON.stringify({
+      total: result.Count,
+      items: result.Items.map((area) => {
+        return {
+          uuid: area.uuid,
+          name: area.name,
+        };
+      }),
+    }),
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
