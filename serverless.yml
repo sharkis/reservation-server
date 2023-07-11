@@ -158,13 +158,13 @@ functions:
           path: /area
           method: POST
   deleteArea:
-    handler: tags.deleteArea
+    handler: areas.deleteArea
     events:
       - httpApi:
           path: /area
           method: DELETE
   getAreas:
-    handler: tags.getAreas
+    handler: areas.getAreas
     events:
       - httpApi:
           path: /areas

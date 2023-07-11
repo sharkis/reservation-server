@@ -16,9 +16,32 @@ const getAreas  = async (event) =>{
       "Access-Control-Allow-Credentials": true,
     },
   }
-
 }
 
+const createArea = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const putParams = {
+    TableName: process.env.DYNAMODB_AREAS_TABLE,
+    Item: {
+      uuid: uuidv4(),
+      name: body.name,
+    },
+  };
+  await dynamoDb.put(putParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+    body: JSON.stringify({
+      status: "OK",
+    }),
+  };
+};
+
 module.exports = {
-    getAreas
+    getAreas,
+    createArea
 }
