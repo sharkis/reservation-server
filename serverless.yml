@@ -151,6 +151,24 @@ functions:
       - httpApi:
           path: /tags
           method: GET
+  createArea:
+    handler: areas.createArea
+    events:
+      - httpApi:
+          path: /area
+          method: POST
+  deleteArea:
+    handler: tags.deleteArea
+    events:
+      - httpApi:
+          path: /area
+          method: DELETE
+  getAreas:
+    handler: tags.getAreas
+    events:
+      - httpApi:
+          path: /areas
+          method: GET
 
 resources:
   Resources:
@@ -224,6 +242,17 @@ resources:
         KeySchema:
           - AttributeName: uuid
             KeyType: HASH
+    AreasTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-areasTable-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
 
 provider:
   name: aws
@@ -249,6 +278,7 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-adminTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-eventsTable-${sls:stage}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-tagsTable-${sls:stage}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-areasTable-${sls:stage}
         - Effect: "Allow"
           Action:
             - "ses:sendEmail"
@@ -259,5 +289,8 @@ provider:
     DYNAMODB_VIP_TABLE: ${self:service}-vipTable-${sls:stage}
     DYNAMODB_LAYOUT_TABLE: ${self:service}-layoutTable-${sls:stage}
     DYNAMODB_ADMIN_TABLE: ${self:service}-adminTable-${sls:stage}
+    DYNAMODB_EVENTS_TABLE: ${self:service}-eventsTable-${sls:stage}
+    DYNAMODB_TAGS_TABLE: ${self:service}-tagsTable-${sls:stage}
+    DYNAMODB_AREAS_TABLE: ${self:service}-areasTable-${sls:stage}
     twilioSID: ${ssm:/twiliosid}
     twilioAuth: ${ssm:/twilioauth}
