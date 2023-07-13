@@ -157,6 +157,12 @@ functions:
       - httpApi:
           path: /area
           method: POST
+  updateArea:
+    handler: areas.updateArea
+    events:
+      - httpApi:
+          path: /area
+          method: PUT
   deleteArea:
     handler: areas.deleteArea
     events:

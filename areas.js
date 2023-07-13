@@ -50,7 +50,58 @@ const createArea = async (event) => {
   };
 };
 
+const updateArea = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const updateParams = {
+    TableName: process.env.DYNAMODB_AREAS_TABLE,
+    Key: {
+      uuid: body.uuid
+    },
+    UpdateExpression:
+      "set #n=:n",
+    ExpressionAttributeNames: {
+      "#n": "name",
+    },
+    ExpressionAttributeValues: {
+      ":n": body.name,
+    },
+  };
+  await dynamoDb.update(updateParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+    body: JSON.stringify({
+      status: "OK",
+    }),
+  };
+};
+
+const deleteArea = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const deleteParams = {
+    TableName: process.env.DYNAMODB_AREAS_TABLE,
+    Key: {
+      uuid: body.uuid
+    },
+  };
+  await dynamoDb.delete(deleteParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+  };
+};
+
 module.exports = {
     getAreas,
-    createArea
+    createArea,
+    updateArea,
+    deleteArea
 }

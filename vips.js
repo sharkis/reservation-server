@@ -141,20 +141,6 @@ const updateVip = async (event) => {
       ":r": body.relationship,
     },
   };
-  const putParams = {
-    TableName: process.env.DYNAMODB_VIP_TABLE,
-    Item: {
-      uuid: uuidv4(),
-      name: body.name,
-      phone: body.phone,
-      email: body.email,
-      notes: body.notes,
-      food: body.food,
-      drink: body.drink,
-      relationship: body.relationship,
-      seating: body.seating,
-    },
-  };
   await dynamoDb.update(updateParams).promise();
   return {
     statusCode: 200,

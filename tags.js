@@ -52,7 +52,60 @@ const createTag = async (event) => {
   };
 };
 
+const deleteTag = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const deleteParams = {
+    TableName: process.env.DYNAMODB_TAGS_TABLE,
+    Key: {
+      uuid: body.uuid
+    },
+  };
+  await dynamoDb.delete(deleteParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+  };
+};
+
+const updateTag = async (event) => {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const body = JSON.parse(event.body);
+  const updateParams = {
+    TableName: process.env.DYNAMODB_TAGS_TABLE,
+    Key: {
+      uuid: body.uuid
+    },
+    UpdateExpression:
+      "set #n=:n, #c=:c",
+    ExpressionAttributeNames: {
+      "#n": "name",
+      "#c": "color",
+    },
+    ExpressionAttributeValues: {
+      ":n": body.name,
+      ":c": body.color,
+    },
+  };
+  await dynamoDb.update(updateParams).promise();
+  return {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+    body: JSON.stringify({
+      status: "OK",
+    }),
+  };
+};
+
 module.exports = {
   getTags,
   createTag,
+  deleteTag,
+  updateTag
 };

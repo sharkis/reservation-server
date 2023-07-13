@@ -13,12 +13,12 @@ const createReservation = async (event) => {
   const origPhone = "+18884921198";
   const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const date = +(body.datetime / 86400).toFixed(0);
+  const bucketdate = new Date((body.datetime * 1000));
   const ses = new AWS.SES();
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
-      dayval: date,
+      dayval: +(bucketdate.getFullYear()+''+bucketdate.getMonth()+''+bucketdate.getDate()),
       uuid: uuidv4(),
       area: body.area,
       customer: {
@@ -157,12 +157,13 @@ const checkReservation = async (event) => {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const body = JSON.parse(event.body);
   const sdate = +(body.timestamp / 86400).toFixed(0);
+  const bucketdate = new Date((body.datetime * 1000));
   const windowStart = body.timestamp - 150 * 60; // 150 minutes - longest reservation
   const windowEnd = body.timestamp + 150 * 60; // 150 minutes - longest reservation
   const queryParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     ExpressionAttributeValues: {
-      ":sd": sdate,
+      ":sd": +(bucketdate.getFullYear()+''+bucketdate.getMonth()+''+bucketdate.getDate()),
       ":st": windowStart,
       ":et": windowEnd,
     },
