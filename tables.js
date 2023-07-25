@@ -18,6 +18,7 @@ const createTable = async (event) => {
         y: t.y,
         name: t.name,
         capacity: t.capacity,
+        areaId: t.areaId,
       },
     },
   }));
@@ -34,8 +35,9 @@ const createTable = async (event) => {
   };
 };
 
-const getTables = async () => {
+const getTables = async (event) => {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
+  const areaId = event.queryStringParameters.areaId;
   const scanParams = {
     TableName: process.env.DYNAMODB_LAYOUT_TABLE,
   };
@@ -45,14 +47,21 @@ const getTables = async () => {
     statusCode: 200,
     body: JSON.stringify({
       total: result.Count,
-      items: result.Items.map((t) => ({
+      items: result.Items.filter((t)=>{
+        if(!!areaId){
+          return t.areaId==areaId
+        }
+        return true;
+      }).map((t) => { 
+        return {
         x: t.x,
         y: t.y,
         id: t.uuid,
         name: t.name,
         capacity: t.capacity,
         rotation: t.rotation,
-      })),
+        areaId: t.areaId,
+      }}),
     }),
   };
 };
