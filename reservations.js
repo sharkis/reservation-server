@@ -30,6 +30,7 @@ const createReservation = async (event) => {
       occasion: body.occasion,
       size: body.size,
       timestamp: body.datetime,
+      restrictions: body.restrictions,
     },
   };
   const emailParams = {
@@ -143,6 +144,7 @@ const getReservations = async (event) => {
           size: reservation.size,
           timestamp: reservation.timestamp,
           date: reservation.dayval,
+          restrictions: reservation.restrictions,
         };
       }),
     }),
@@ -157,7 +159,7 @@ const checkReservation = async (event) => {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const body = JSON.parse(event.body);
   const sdate = +(body.timestamp / 86400).toFixed(0);
-  const bucketdate = new Date((body.datetime * 1000));
+  const bucketdate = new Date((body.timestamp * 1000));
   const windowStart = body.timestamp - 150 * 60; // 150 minutes - longest reservation
   const windowEnd = body.timestamp + 150 * 60; // 150 minutes - longest reservation
   const queryParams = {
