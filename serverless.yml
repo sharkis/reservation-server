@@ -25,6 +25,12 @@ functions:
       - httpApi:
           path: /checkReservation
           method: POST
+  updateReservation:
+    handler: reservations.updateReservation
+    events:
+      - httpApi:
+          path: /reservation
+          method: PUT
   createTable:
     handler: tables.createTable
     events:
