@@ -13,7 +13,7 @@ const createReservation = async (event) => {
   const origPhone = "+18884921198";
   const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const bucketdate = new Date(body.datetime * 1000);
+  const bucketdate = new Date(body.datetime);
   const ses = new AWS.SES();
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
