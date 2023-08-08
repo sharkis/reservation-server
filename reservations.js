@@ -13,17 +13,18 @@ const createReservation = async (event) => {
   const origPhone = "+18884921198";
   const body = JSON.parse(event.body);
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const bucketdate = new Date(body.datetime);
+  const bucketdate = dayjs(body.datetime)
+        .tz("America/Denver");
   const ses = new AWS.SES();
   const putParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     Item: {
       dayval: +(
-        bucketdate.getFullYear() +
+        bucketdate.year() +
         "" +
-        bucketdate.getMonth() +
+        bucketdate.month() +
         "" +
-        bucketdate.getDate()
+        bucketdate.date()
       ),
       uuid: uuidv4(),
       area: body.area,
@@ -48,7 +49,7 @@ const createReservation = async (event) => {
         Text: {
           Charset: "UTF-8",
           Data: `Your Lola Rose reservation for ${body.size} people on ${dayjs
-            .unix(body.datetime)
+            (body.datetime)
             .tz("America/Denver")
             .format("dddd, D MMM [at] h:mm a")} is CONFIRMED.`,
         },
@@ -65,7 +66,7 @@ const createReservation = async (event) => {
   if (toNumber.isValid) {
     await client.messages.create({
       body: `Your Lola Rose reservation for ${body.size} people on ${dayjs
-        .unix(body.datetime)
+        (body.datetime)
         .tz("America/Denver")
         .format("dddd, D MMM [at] h:mm a")} is CONFIRMED.`,
       from: origPhone,
@@ -101,7 +102,7 @@ const createReservation = async (event) => {
             Data: `VIP Lola Rose reservation for ${body.customer.name}, ${
               body.size
             } people on ${dayjs
-              .unix(body.datetime)
+              (body.datetime)
               .tz("America/Denver")
               .format("dddd, D MMM [at] h:mm a")} has been created.`,
           },
@@ -131,17 +132,17 @@ const createReservation = async (event) => {
 const getReservations = async (event) => {
   const qdate = event.queryStringParameters.datetime;
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const bucketdate = new Date(+qdate);
+  const bucketdate = dayjs(+qdate).tz("America/Denver");
   const scanParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     FilterExpression: "dayval = :d",
     ExpressionAttributeValues: {
       ":d": +(
-        bucketdate.getFullYear() +
+        bucketdate.year() +
         "" +
-        bucketdate.getMonth() +
+        bucketdate.month() +
         "" +
-        bucketdate.getDate()
+        bucketdate.date()
       ),
     },
   };
@@ -175,18 +176,18 @@ const checkReservation = async (event) => {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   const body = JSON.parse(event.body);
   const sdate = +(body.timestamp / 86400).toFixed(0);
-  const bucketdate = new Date(body.timestamp * 1000);
+  const bucketdate = dayjs(body.timestamp);
   const windowStart = body.timestamp - 150 * 60; // 150 minutes - longest reservation
   const windowEnd = body.timestamp + 150 * 60; // 150 minutes - longest reservation
   const queryParams = {
     TableName: process.env.DYNAMODB_RESERVATION_TABLE,
     ExpressionAttributeValues: {
       ":sd": +(
-        bucketdate.getFullYear() +
+        bucketdate.year() +
         "" +
-        bucketdate.getMonth() +
+        bucketdate.month() +
         "" +
-        bucketdate.getDate()
+        bucketdate.date()
       ),
       ":st": windowStart,
       ":et": windowEnd,
